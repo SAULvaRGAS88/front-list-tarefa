@@ -1,10 +1,17 @@
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { PaginaLogin } from "./paginas/login/PaginaLogin";
+import { PaginaHome } from "./paginas/home/PaginaHome";
+
 
 function App() {
 
   return (
-    <>
-     <h1>Front List Tarefa</h1>
-    </>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<PaginaLogin />} />
+        <Route path="/home/:idUsuario" element={<PaginaHome />} />
+      </Routes>
+    </BrowserRouter>
   )
 }
 
