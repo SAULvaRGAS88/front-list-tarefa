@@ -3,7 +3,9 @@ import { useState } from "react"
 import { CircularProgress } from "@mui/material"
 import { conexaoApi } from "../../servicos/api/ConexaoApi"
 import { useNavigate } from "react-router-dom"
-import { LoginContainer, LoginCard, Logo, FormContainer, StyledTextField, StyledButton, LoadingContainer, WelcomeText, } from "./PaginaLoginStyles"
+import { LoginContainer, Card, Logo, FormContainer, StyledTextField, StyledButton, LoadingContainer, WelcomeText, } from "./PaginaLoginStyles"
+import { ModalCastro } from "./ModalCastro"
+import { useSnackbar } from "../../servicos/context/SnackbarContext"
 
 
 export const PaginaLogin = () => {
@@ -12,29 +14,37 @@ export const PaginaLogin = () => {
     const [email, setEmail] = useState('')
     const [senha, setSenha] = useState('')
     const [loading, setLoading] = useState(false)
+    const [open, setOpen] = useState(false)
+
+    //funções para abrir e fechar o modal
+    const handleOpen = () => setOpen(true)
+    const handleClose = () => setOpen(false)
 
     //navegação
     const navigate = useNavigate()
 
+    //hook snackbar context
+    const { showSnackbar } = useSnackbar()
+
     /**Função de autenticação de login */
     const handleLogin = async (email: string, senha: string) => {
         if (!email || !senha) return alert('Preencha email e senha');
-    
+
         setLoading(true);
         try {
             const res = await conexaoApi.post('/usuarios/login', { email, senha });
             const usuario = res.data.data;
-    
+
             if (!usuario) throw new Error('Usuário não retornado');
-    
+
             const usuarioObj = { nome: usuario.nome, id: usuario.id };
             localStorage.setItem('usuario', JSON.stringify(usuarioObj));
-    
+            showSnackbar('Login realizado com sucesso!', 'success', 2000);
             navigate(`/home/${usuario.id}`);
         } catch (err: any) {
             console.error('Erro no login', err.response?.data || err.message);
             localStorage.removeItem('usuario');
-            alert('Login falhou, verifique seus dados');
+            showSnackbar('Login falhou, verifique seus dados', 'error', 2000);
         } finally {
             setLoading(false);
         }
@@ -48,18 +58,18 @@ export const PaginaLogin = () => {
 
     return (
         <LoginContainer>
-            <LoginCard>
+            <Card>
                 <Logo>📋 Lista de Tarefas</Logo>
                 <WelcomeText>
                     Faça login para acessar suas tarefas
                 </WelcomeText>
-                
+
                 {loading && (
                     <LoadingContainer>
                         <CircularProgress size={40} />
                     </LoadingContainer>
                 )}
-                
+
                 <FormContainer onSubmit={handleSubmit}>
                     <StyledTextField
                         required
@@ -72,7 +82,7 @@ export const PaginaLogin = () => {
                         onChange={(e: any) => setEmail(e.target.value)}
                         disabled={loading}
                     />
-                    
+
                     <StyledTextField
                         required
                         id="senha"
@@ -84,7 +94,7 @@ export const PaginaLogin = () => {
                         onChange={(e: any) => setSenha(e.target.value)}
                         disabled={loading}
                     />
-                    
+
                     <StyledButton
                         variant="contained"
                         type="submit"
@@ -93,8 +103,21 @@ export const PaginaLogin = () => {
                     >
                         {loading ? 'Entrando...' : 'Entrar'}
                     </StyledButton>
+
+                    {/**Botão para cadastro*/}
+                    <StyledButton
+                        variant="contained"
+                        type="button"
+                        fullWidth
+                        onClick={handleOpen}
+                    >
+                        Cadastre-se
+                    </StyledButton>
                 </FormContainer>
-            </LoginCard>
+            </Card>
+
+            {/**Modal para cadastro*/}
+            <ModalCastro open={open} onClose={handleClose} />
         </LoginContainer>
     )
 }

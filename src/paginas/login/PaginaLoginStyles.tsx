@@ -1,17 +1,18 @@
-import { Button, TextField } from "@mui/material"
+import { Button, Modal, TextField } from "@mui/material"
 import styled from "styled-components"
 
 // Styled Components
 export const LoginContainer = styled.div`
-  min-height: 100vh;
+  height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 1rem;
-`
+  box-sizing: border-box;
+`;
 
-export const LoginCard = styled.div`
+export const Card = styled.div`
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
   border-radius: 20px;
@@ -116,4 +117,21 @@ export const WelcomeText = styled.p`
   @media (min-width: 768px) {
     font-size: 1rem;
   }
+`
+
+export const ModalCastroContainer = styled(props => <Modal {...props} />)`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`
+
+export const TituloCadastro = styled.h2`
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 2rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 `
