@@ -195,21 +195,42 @@ export const PainelCard = styled(Card)`
   }
 `
 
-// Container das tarefas
+// Container das tarefas - usando grid
 export const TarefasContainer = styled.div`
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr;
   gap: 1rem;
+  
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+  
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+  
+  @media (min-width: 1200px) {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+  }
 `
 
-// Item de tarefa
-export const TarefaItem = styled.div`
+// Item de tarefa - menor e mais compacto
+export const TarefaItem = styled.div<{ color: string }>`
   background: linear-gradient(135deg, #f8f9ff 0%, #e8ecff 100%);
   border-radius: 12px;
-  padding: 1rem;
-  border-left: 4px solid #667eea;
+  padding: 0.75rem;
+  border-left: 7px solid ${props => props.color || '#667eea'};
+  border-right: 1px solid gray;
+  border-bottom: 1px solid gray;
+  border-top: 1px solid gray;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
   
   &:hover {
     transform: translateY(-2px);
@@ -218,110 +239,182 @@ export const TarefaItem = styled.div`
   
   @media (min-width: 768px) {
     border-radius: 15px;
-    padding: 1.25rem;
+    padding: 1rem;
+    min-height: 140px;
   }
 `
 
-// Cabeçalho da tarefa
+// Cabeçalho da tarefa - mais compacto
 export const TarefaHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.5rem;
   gap: 0.5rem;
+  
+  @media (min-width: 768px) {
+    margin-bottom: 0.75rem;
+  }
 `
 
-// Nome da tarefa
-export const TarefaNome = styled(Typography)`
+// Nome da tarefa - menor
+export const TarefaNome = styled(TextField)`
   && {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: #333;
     flex: 1;
     
-    @media (min-width: 768px) {
-      font-size: 1.2rem;
+    .MuiOutlinedInput-root {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #333;
+      line-height: 1.3;
+      padding: 0;
+      
+      @media (min-width: 768px) {
+        font-size: 1rem;
+      }
+      
+      fieldset {
+        border: none;
+      }
+      
+      &:hover fieldset {
+        border: none;
+      }
+      
+      &.Mui-focused fieldset {
+        border: 1px solid #667eea;
+        border-radius: 4px;
+      }
+    }
+    
+    .MuiInputBase-input {
+      padding: 0;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #333;
+      
+      @media (min-width: 768px) {
+        font-size: 1rem;
+      }
     }
   }
 `
 
-// Container do status e favorito
+// Container do status e favorito - mais compacto
 export const TarefaMeta = styled.div`
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.25rem;
+  flex-shrink: 0;
 `
 
-// Status da tarefa - usando prop transiente
+// Status da tarefa - menor
 export const TarefaStatus = styled.span<{ $status: boolean }>`
-  padding: 0.25rem 0.75rem;
-  border-radius: 20px;
-  font-size: 0.75rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.65rem;
   font-weight: 600;
   text-transform: uppercase;
   background: ${props => props.$status ? '#ff6b6b' : '#51cf66'};
   color: white;
+  cursor: pointer;
   
   @media (min-width: 768px) {
-    font-size: 0.8rem;
-    padding: 0.3rem 0.8rem;
+    font-size: 0.7rem;
+    padding: 0.25rem 0.6rem;
   }
 `
 
-// Descrição da tarefa
-export const TarefaDescricao = styled(Typography)`
+// Descrição da tarefa - menor e truncada
+export const TarefaDescricao = styled(TextField)`
   && {
-    color: #666;
-    font-size: 0.9rem;
-    line-height: 1.5;
-    margin-bottom: 0.75rem;
+    flex: 1;
+    margin-bottom: 0.5rem;
     
     @media (min-width: 768px) {
-      font-size: 1rem;
-      margin-bottom: 1rem;
+      margin-bottom: 0.75rem;
+    }
+    
+    .MuiOutlinedInput-root {
+      color: #666;
+      font-size: 0.8rem;
+      line-height: 1.4;
+      padding: 0;
+      
+      @media (min-width: 768px) {
+        font-size: 0.85rem;
+      }
+      
+      fieldset {
+        border: none;
+      }
+      
+      &:hover fieldset {
+        border: none;
+      }
+      
+      &.Mui-focused fieldset {
+        border: 1px solid #667eea;
+        border-radius: 4px;
+      }
+    }
+    
+    .MuiInputBase-input {
+      padding: 0;
+      color: #666;
+      font-size: 0.8rem;
+      line-height: 1.4;
+      
+      @media (min-width: 768px) {
+        font-size: 0.85rem;
+      }
     }
   }
 `
 
-// Informações da tarefa
+// Informações da tarefa - mais compactas
 export const TarefaInfo = styled.div`
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  font-size: 0.8rem;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.7rem;
   color: #888;
+  margin-top: auto;
   
   @media (min-width: 768px) {
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 0.85rem;
+    font-size: 0.75rem;
   }
 `
 
-// Data de criação
+// Data de criação - mais compacta
 export const TarefaData = styled.div`
   display: flex;
-  align-items: center;
-  gap: 0.25rem;
+  flex-direction: column;
+  gap: 0.1rem;
+  
+  @media (min-width: 768px) {
+    flex-direction: row;
+    gap: 0.25rem;
+  }
 `
 
-// Cor da tarefa - usando prop transiente
+// Cor da tarefa - menor
 export const TarefaCor = styled.div<{ $cor: string }>`
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
   background-color: ${props => props.$cor || '#667eea'};
   border: 2px solid white;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  flex-shrink: 0;
   
   @media (min-width: 768px) {
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    height: 20px;
   }
 `
 
-// Ícone de favorito
+// Ícone de favorito - menor
 export const FavoritoIcon = styled.div`
   display: flex;
   align-items: center;
@@ -331,6 +424,213 @@ export const FavoritoIcon = styled.div`
   
   &:hover {
     transform: scale(1.1);
+  }
+  
+  .MuiSvgIcon-root {
+    font-size: 1.3rem !important;
+    
+    @media (min-width: 768px) {
+      font-size: 1.5rem !important;
+    }
+  }
+`
+
+// Container para cor com ícone
+export const ColorContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+  
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+  
+  .MuiSvgIcon-root {
+    font-size: 1.2rem !important;
+    color: #666;
+    
+    @media (min-width: 768px) {
+      font-size: 1.4rem !important;
+    }
+  }
+`
+
+// Container de ações (editar/deletar)
+export const ActionsContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.1rem;
+  justify-content: flex-end;
+  flex-shrink: 0;
+  
+  .MuiSvgIcon-root {
+    font-size: 1.5rem !important;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      transform: scale(1.1);
+    }
+    
+    &:first-child {
+      color: #2196f3;
+      
+      &:hover {
+        background-color: rgba(33, 150, 243, 0.1);
+      }
+    }
+    
+    &:last-child {
+      color: #f44336;
+      
+      &:hover {
+        background-color: rgba(244, 67, 54, 0.1);
+      }
+    }
+    
+    /* Ícones de salvar e cancelar */
+    &[data-icon="save"] {
+      color: #4caf50;
+      
+      &:hover {
+        background-color: rgba(76, 175, 80, 0.1);
+      }
+    }
+    
+    &[data-icon="cancel"] {
+      color: #ff9800;
+      
+      &:hover {
+        background-color: rgba(255, 152, 0, 0.1);
+      }
+    }
+    
+    @media (min-width: 768px) {
+      font-size: 1.8rem !important;
+      padding: 0.6rem;
+    }
+  }
+`
+
+// Container de informações da tarefa - reorganizado
+export const TarefaInfoContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+  width: 100%;
+`
+
+// Container de data e cor
+export const DataCorContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+  justify-content: flex-start;
+  
+  /* Empilha data e cor verticalmente em telas pequenas */
+  @media (max-width: 480px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+`
+
+// Container da paleta de cores
+export const PaletaCoresContainer = styled.div<{ $position: 'top' | 'bottom' }>`
+  position: absolute;
+  ${props => props.$position === 'top' ? 'bottom: 100%;' : 'top: 100%;'}
+  right: 1rem;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 0.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 200px;
+  margin-${props => props.$position === 'top' ? 'bottom' : 'top'}: 0.5rem;
+  
+  @media (max-width: 480px) {
+    right: 0.5rem;
+    min-width: 180px;
+  }
+`
+
+// Header da paleta com botão de fechar
+export const PaletaHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #eee;
+`
+
+// Título da paleta
+export const PaletaTitle = styled.span`
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #333;
+`
+
+// Botão de fechar
+export const PaletaCloseButton = styled.button`
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+  
+  &:hover {
+    background-color: #f5f5f5;
+  }
+  
+  .MuiSvgIcon-root {
+    font-size: 1rem;
+    color: #666;
+  }
+`
+
+// Container das cores
+export const CoresGrid = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+`
+
+// Item de cor na paleta
+export const CorPaletaItem = styled.div<{ $cor: string, $selected: boolean }>`
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: ${props => props.$cor};
+  cursor: pointer;
+  border: ${props => props.$selected ? '3px solid #333' : '2px solid #fff'};
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+  
+  &:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  }
+  
+  @media (max-width: 480px) {
+    width: 25px;
+    height: 25px;
   }
 `
 
@@ -419,7 +719,7 @@ export const FavoritasContainer = styled.div`
   border-radius: 15px;
   padding: 1rem;
   margin-bottom: 1.5rem;
-  border-left: 4px solid #ffd700;
+  border-left: 7px solid #ffd700;
   box-shadow: 0 4px 12px rgba(255, 215, 0, 0.2);
   
   @media (min-width: 768px) {
@@ -434,7 +734,8 @@ export const TarefasNormaisContainer = styled.div`
   backdrop-filter: blur(10px);
   border-radius: 15px;
   padding: 1rem;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+   border-left: 7px solid gray;
+  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.2);
   
   @media (min-width: 768px) {
     border-radius: 20px;

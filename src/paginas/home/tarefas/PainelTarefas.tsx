@@ -1,21 +1,9 @@
 import { useState, useMemo } from 'react';
-import StarIcon from '@mui/icons-material/Star';
-import StarBorderIcon from '@mui/icons-material/StarBorder';
 import {
     PainelContainer,
     PainelTitle,
     PainelCard,
     TarefasContainer,
-    TarefaItem,
-    TarefaHeader,
-    TarefaNome,
-    TarefaMeta,
-    TarefaStatus,
-    TarefaDescricao,
-    TarefaInfo,
-    TarefaData,
-    TarefaCor,
-    FavoritoIcon,
     EmptyContainer,
     EmptyIcon,
     SearchContainer,
@@ -36,6 +24,7 @@ import {
 } from './PainelTarefasStyles';
 import SearchIcon from '@mui/icons-material/Search';
 import { ModalCriacaoAtividade } from './ModalCriacaoAtividade';
+import { CardTarefa } from './CardTarefa';
 
 export const PainelTarefas = ({ data }: { data: any }) => {
     // Estados para busca e filtros
@@ -152,43 +141,6 @@ export const PainelTarefas = ({ data }: { data: any }) => {
         if (!selectedColor) return 'Cores';
         return `Cor: ${formatarNomeCores(selectedColor)}`;
     }
-
-    // Componente para renderizar uma tarefa
-    const renderTarefa = (task: any) => (
-        <TarefaItem key={task?.id}>
-            <TarefaHeader>
-                <TarefaNome variant="h6">
-                    {task?.nome}
-                </TarefaNome>
-
-                <TarefaMeta>
-                    <TarefaStatus $status={task?.status}>
-                        {task?.status ? 'Pendente' : 'Concluída'}
-                    </TarefaStatus>
-
-                    <FavoritoIcon>
-                        {task?.favorita ?
-                            <StarIcon style={{ color: '#ffd700', fontSize: '1.2rem' }} /> :
-                            <StarBorderIcon style={{ color: '#ccc', fontSize: '1.2rem' }} />
-                        }
-                    </FavoritoIcon>
-                </TarefaMeta>
-            </TarefaHeader>
-
-            <TarefaDescricao variant="body2">
-                {task?.descricao}
-            </TarefaDescricao>
-
-            <TarefaInfo>
-                <TarefaData>
-                    <span> Criado em: {task?.created_at.split('T')[0].split('-').reverse().join('/')}</span>
-                    <span>🕐 às {task?.created_at.split('T')[1].split('.')[0]}</span>
-                </TarefaData>
-
-                <TarefaCor $cor={task?.cor} title={`Cor: ${formatarNomeCores(task?.cor)}`} />
-            </TarefaInfo>
-        </TarefaItem>
-    );
 
     if (!data || data.length === 0 || (data.length === 1 && data[0] === null)) {
         return (
@@ -312,7 +264,15 @@ export const PainelTarefas = ({ data }: { data: any }) => {
                     </SectionTitle>
                     <FavoritasContainer>
                         <TarefasContainer>
-                            {tarefasFavoritas.map(renderTarefa)}
+                            {tarefasFavoritas.map((task: any, index: number) => (
+                                <CardTarefa 
+                                    key={task?.id} 
+                                    task={task} 
+                                    formatarNomeCores={formatarNomeCores} 
+                                    coresDisponiveis={coresDisponiveis}
+                                    isLastItem={index === tarefasFavoritas.length - 1}
+                                />
+                            ))}
                         </TarefasContainer>
                     </FavoritasContainer>
                 </SectionContainer>
@@ -326,7 +286,15 @@ export const PainelTarefas = ({ data }: { data: any }) => {
                     </SectionTitle>
                     <TarefasNormaisContainer>
                         <TarefasContainer>
-                            {tarefasNormais.map(renderTarefa)}
+                            {tarefasNormais.map((task: any, index: number) => (
+                                <CardTarefa 
+                                    key={task?.id} 
+                                    task={task} 
+                                    formatarNomeCores={formatarNomeCores}
+                                    coresDisponiveis={coresDisponiveis}
+                                    isLastItem={index === tarefasNormais.length - 1}
+                                />
+                            ))}
                         </TarefasContainer>
                     </TarefasNormaisContainer>
                 </SectionContainer>
