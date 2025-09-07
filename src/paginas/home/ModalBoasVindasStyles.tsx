@@ -2,21 +2,20 @@ import styled from "styled-components"
 import { Typography, Button } from "@mui/material"
 
 // Header
-export const Header = styled.header`
+export const Header = styled.header<{ isMobile: boolean }>`
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
   border-radius: 15px;
   padding: 1rem;
-  margin-bottom: 1rem;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   display: flex;
-  justify-content: center;
+  justify-content: ${({ isMobile }) => isMobile ? 'center' : 'space-between'};
   align-items: center;
+  gap: 1rem;
   
   @media (min-width: 768px) {
     border-radius: 20px;
     padding: 1.5rem;
-    margin-bottom: 1.5rem;
   }
 `
 
@@ -64,7 +63,6 @@ export const HomeCard = styled.div`
 // Título principal
 export const HomeTitle = styled(Typography)`
   && {
-    font-size: 1.5rem;
     font-weight: 700;
     color: #333;
     margin-bottom: 1rem;
@@ -73,15 +71,7 @@ export const HomeTitle = styled(Typography)`
     -webkit-text-fill-color: transparent;
     background-clip: text;
     text-align: center;
-    
-    @media (min-width: 768px) {
-      font-size: 2rem;
-      margin-bottom: 1.5rem;
-    }
-    
-    @media (min-width: 1024px) {
-      font-size: 2.5rem;
-    }
+  
   }
 `
 
