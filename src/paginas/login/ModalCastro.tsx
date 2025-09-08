@@ -1,10 +1,9 @@
 import { useState } from "react"
-import { CircularProgress } from "@mui/material"
-import { Card, FormContainer, ModalCastroContainer, StyledButton, StyledTextField, LoadingContainer, WelcomeText, TituloCadastro } from "./PaginaLoginStyles"
+import { Card, FormContainer, ModalCastroContainer, StyledButton, StyledTextField, WelcomeText, TituloCadastro } from "./PaginaLoginStyles"
 import { conexaoApi } from "../../servicos/api/ConexaoApi"
 import { useSnackbar } from "../../servicos/context/SnackbarContext"
 
-export const ModalCastro = ({ open, onClose }: { open: boolean, onClose: () => void }) => {
+export const ModalCastro = ({ open, onClose, onLoadingChange }: { open: boolean, onClose: () => void, onLoadingChange?: (loading: boolean) => void }) => {
 
     /**Estado do componente*/
     const [nome, setNome] = useState('')
@@ -15,7 +14,7 @@ export const ModalCastro = ({ open, onClose }: { open: boolean, onClose: () => v
     const [loading, setLoading] = useState(false)
     const [erros, setErros] = useState<{[key: string]: string}>({})
 
-    // Hook snackbar context
+    /**Hook snackbar context*/
     const { showSnackbar } = useSnackbar()
 
     /**Função para validar campos*/
@@ -69,8 +68,10 @@ export const ModalCastro = ({ open, onClose }: { open: boolean, onClose: () => v
         if (!validarCampos()) return
 
         setLoading(true)
+        if (onLoadingChange) {
+            onLoadingChange(true)
+        }
         try {
-            // Chamar a API de cadastro
             const res = await conexaoApi.post('/usuarios', { nome, email, senha });
             const usuario = res.data.data;
 
@@ -84,6 +85,9 @@ export const ModalCastro = ({ open, onClose }: { open: boolean, onClose: () => v
             showSnackbar(errorMessage, 'error')
         } finally {
             setLoading(false)
+            if (onLoadingChange) {
+                onLoadingChange(false)
+            }
         }
     }
 
@@ -106,12 +110,6 @@ export const ModalCastro = ({ open, onClose }: { open: boolean, onClose: () => v
                 <WelcomeText>
                     Preencha os campos abaixo para criar sua conta
                 </WelcomeText>
-
-                {loading && (
-                    <LoadingContainer>
-                        <CircularProgress size={40} />
-                    </LoadingContainer>
-                )}
 
                 <FormContainer>
                     <StyledTextField

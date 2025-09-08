@@ -1,5 +1,5 @@
 import styled from "styled-components"
-import { Typography, Card, TextField, IconButton } from "@mui/material"
+import { Typography, Card, TextField, IconButton, Button } from "@mui/material"
 import NoteAddIcon from '@mui/icons-material/NoteAdd';
 
 // Container principal
@@ -648,6 +648,139 @@ export const EmptyIcon = styled.div`
   opacity: 0.5;
 `
 
+// Modal de confirmação de exclusão
+export const ModalConfirmacaoContainer = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 1rem;
+`;
+
+export const ModalConfirmacaoCard = styled.div`
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  max-width: 400px;
+  width: 100%;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  text-align: center;
+  animation: slideIn 0.3s ease-out;
+
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(-20px) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @media (max-width: 480px) {
+    padding: 1.5rem;
+    margin: 1rem;
+  }
+`;
+
+export const ModalConfirmacaoIcon = styled.div`
+  width: 64px;
+  height: 64px;
+  background: linear-gradient(135deg, #ff6b6b, #ff5252);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+  box-shadow: 0 8px 20px rgba(255, 107, 107, 0.3);
+
+  .MuiSvgIcon-root {
+    font-size: 2rem;
+    color: white;
+  }
+`;
+
+export const ModalConfirmacaoTitle = styled.h3`
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 0.5rem 0;
+  line-height: 1.3;
+
+  @media (max-width: 480px) {
+    font-size: 1.3rem;
+  }
+`;
+
+export const ModalConfirmacaoMessage = styled.p`
+  font-size: 1rem;
+  color: #666;
+  margin: 0 0 2rem 0;
+  line-height: 1.5;
+
+  @media (max-width: 480px) {
+    font-size: 0.9rem;
+  }
+`;
+
+export const ModalConfirmacaoActions = styled.div`
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+
+  @media (max-width: 480px) {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+`;
+
+export const ModalConfirmacaoButton = styled.button<{ $variant: 'cancel' | 'delete' }>`
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 120px;
+
+  ${props => props.$variant === 'cancel' ? `
+    background: #f5f5f5;
+    color: #666;
+    
+    &:hover {
+      background: #e0e0e0;
+      transform: translateY(-1px);
+    }
+  ` : `
+    background: linear-gradient(135deg, #ff6b6b, #ff5252);
+    color: white;
+    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+    
+    &:hover {
+      background: linear-gradient(135deg, #ff5252, #ff1744);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(255, 107, 107, 0.4);
+    }
+    
+    &:active {
+      transform: translateY(0);
+    }
+  `}
+
+  @media (max-width: 480px) {
+    width: 100%;
+    padding: 1rem;
+  }
+`;
+
 // Container do ícone de adição
 export const AdicionarIconContainer = styled.div`
   display: flex;
@@ -740,5 +873,42 @@ export const TarefasNormaisContainer = styled.div`
   @media (min-width: 768px) {
     border-radius: 20px;
     padding: 1.5rem;
+  }
+`
+
+// Botão para criar primeira tarefa
+export const BotaoCriarPrimeiraTarefa = styled(Button)`
+  && {
+    margin-top: 1.5rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 0.75rem 2rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    transition: all 0.3s ease;
+    text-transform: none;
+    
+    &:hover {
+      background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+    
+    &:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+    }
+    
+    .MuiButton-startIcon {
+      margin-right: 0.5rem;
+    }
+    
+    @media (max-width: 768px) {
+      padding: 0.6rem 1.5rem;
+      font-size: 0.9rem;
+      margin-top: 1rem;
+    }
   }
 `

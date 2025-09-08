@@ -1,11 +1,11 @@
 
 import { useState } from "react"
-import { CircularProgress } from "@mui/material"
 import { conexaoApi } from "../../servicos/api/ConexaoApi"
 import { useNavigate } from "react-router-dom"
-import { LoginContainer, Card, Logo, FormContainer, StyledTextField, StyledButton, LoadingContainer, WelcomeText, } from "./PaginaLoginStyles"
+import { LoginContainer, Card, Logo, FormContainer, StyledTextField, StyledButton, WelcomeText, } from "./PaginaLoginStyles"
 import { ModalCastro } from "./ModalCastro"
 import { useSnackbar } from "../../servicos/context/SnackbarContext"
+import { LoadApp } from "../../componentes/loadApp/LoadApp"
 
 
 export const PaginaLogin = () => {
@@ -15,6 +15,7 @@ export const PaginaLogin = () => {
     const [senha, setSenha] = useState('')
     const [loading, setLoading] = useState(false)
     const [open, setOpen] = useState(false)
+    const [openLoadApp, setOpenLoadApp] = useState(false)
 
     //funções para abrir e fechar o modal
     const handleOpen = () => setOpen(true)
@@ -31,6 +32,7 @@ export const PaginaLogin = () => {
         if (!email || !senha) return alert('Preencha email e senha');
 
         setLoading(true);
+        setOpenLoadApp(true);
         try {
             const res = await conexaoApi.post('/usuarios/login', { email, senha });
             const usuario = res.data.data;
@@ -47,6 +49,7 @@ export const PaginaLogin = () => {
             showSnackbar('Login falhou, verifique seus dados', 'error', 2000);
         } finally {
             setLoading(false);
+            setOpenLoadApp(false);
         }
     };
 
@@ -63,12 +66,6 @@ export const PaginaLogin = () => {
                 <WelcomeText>
                     Faça login para acessar suas tarefas
                 </WelcomeText>
-
-                {loading && (
-                    <LoadingContainer>
-                        <CircularProgress size={40} />
-                    </LoadingContainer>
-                )}
 
                 <FormContainer onSubmit={handleSubmit}>
                     <StyledTextField
@@ -117,7 +114,10 @@ export const PaginaLogin = () => {
             </Card>
 
             {/**Modal para cadastro*/}
-            <ModalCastro open={open} onClose={handleClose} />
+            <ModalCastro open={open} onClose={handleClose} onLoadingChange={setOpenLoadApp} />
+
+            {/* loadApp */}
+            <LoadApp open={openLoadApp} />
         </LoginContainer>
     )
 }

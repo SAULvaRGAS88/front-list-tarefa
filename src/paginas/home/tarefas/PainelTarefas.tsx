@@ -20,24 +20,26 @@ import {
     SectionContainer,
     SectionTitle,
     FavoritasContainer,
-    TarefasNormaisContainer
+    TarefasNormaisContainer,
+    BotaoCriarPrimeiraTarefa
 } from './PainelTarefasStyles';
 import SearchIcon from '@mui/icons-material/Search';
 import { ModalCriacaoAtividade } from './ModalCriacaoAtividade';
 import { CardTarefa } from './CardTarefa';
 
-export const PainelTarefas = ({ data }: { data: any }) => {
-    // Estados para busca e filtros
+export const PainelTarefas = ({ data, onTaskUpdated, onLoadingChange, onDeleteTask }: { data: any, onTaskUpdated?: () => void, onLoadingChange?: (loading: boolean) => void, onDeleteTask?: (taskId: string) => void }) => {
+
+    /**Estados para busca e filtros*/
     const [searchTerm, setSearchTerm] = useState('');
     const [filterStatus, setFilterStatus] = useState<'all' | 'pending' | 'completed'>('all');
     const [filterToday, setFilterToday] = useState<'all' | 'today'>('all');
     const [selectedColor, setSelectedColor] = useState<string>('');
     const [showColorPalette, setShowColorPalette] = useState(false);
 
-    //estado do componente
+    /**estado do componente*/
     const [openModalCriacao, setOpenModalCriacao] = useState(false)
 
-    // Cores disponíveis (mesmas do modal de criação)
+    /**Cores disponíveis (mesmas do modal de criação)*/
     const coresDisponiveis = [
         '#667eea', '#764ba2', '#f093fb', '#f5576c',
         '#4facfe', '#00f2fe', '#43e97b', '#38f9d7',
@@ -45,7 +47,7 @@ export const PainelTarefas = ({ data }: { data: any }) => {
         '#ff9a9e', '#fecfef',
     ];
 
-    // switch para formatar o nome das cores para pt-BR
+    /**switch para formatar o nome das cores para pt-BR*/
     const formatarNomeCores = (cor: string) => {
         switch (cor) {
             case '#667eea':
@@ -86,40 +88,38 @@ export const PainelTarefas = ({ data }: { data: any }) => {
     /**Função para fechar o modal de criação de atividade */
     const handleCloseModalCriacao = () => setOpenModalCriacao(false)
 
-    // Função para verificar se a tarefa foi criada hoje
+    /**Função para verificar se a tarefa foi criada hoje*/
     const isToday = (createdAt: string) => {
         const today = new Date().toISOString().split('T')[0];
         const taskDate = createdAt.split('T')[0];
         return today === taskDate;
     }
 
-    // Função para filtrar e buscar tarefas
+    /**Função para filtrar e buscar tarefas*/
     const filteredTasks = useMemo(() => {
         if (!data || data.length === 0) return [];
 
         return data.filter((task: any) => {
-            // Filtro por busca (nome ou descrição)
             const matchesSearch = !searchTerm ||
                 task?.nome?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 task?.descricao?.toLowerCase().includes(searchTerm.toLowerCase());
 
-            // Filtro por status
+
             const matchesStatus = filterStatus === 'all' ||
                 (filterStatus === 'pending' && task?.status === true) ||
                 (filterStatus === 'completed' && task?.status === false);
 
-            // Filtro por data (hoje)
             const matchesToday = filterToday === 'all' ||
                 (filterToday === 'today' && isToday(task?.created_at));
 
-            // Filtro por cor
+
             const matchesColor = !selectedColor || task?.cor === selectedColor;
 
             return matchesSearch && matchesStatus && matchesToday && matchesColor;
         });
     }, [data, searchTerm, filterStatus, filterToday, selectedColor]);
 
-    // Separar tarefas favoritas das normais
+    /**Função para separar tarefas favoritas das normais*/
     const { tarefasFavoritas, tarefasNormais } = useMemo(() => {
         const favoritas = filteredTasks.filter((task: any) => task?.favorita === true);
         const normais = filteredTasks.filter((task: any) => task?.favorita === false);
@@ -130,13 +130,13 @@ export const PainelTarefas = ({ data }: { data: any }) => {
         };
     }, [filteredTasks]);
 
-    // Função para lidar com seleção de cor
+    /**Função para lidar com seleção de cor*/
     const handleColorSelect = (cor: string) => {
         setSelectedColor(selectedColor === cor ? '' : cor);
         setShowColorPalette(false);
     }
 
-    // Função para obter o nome da cor selecionada
+    /**Função para obter o nome da cor selecionada*/
     const getSelectedColorName = () => {
         if (!selectedColor) return 'Cores';
         return `Cor: ${formatarNomeCores(selectedColor)}`;
@@ -153,8 +153,25 @@ export const PainelTarefas = ({ data }: { data: any }) => {
                         <EmptyIcon>📝</EmptyIcon>
                         <p>Nenhuma tarefa encontrada</p>
                         <p>Crie sua primeira tarefa para começar!</p>
+
+                        {/* Botão para criar primeira tarefa */}
+                        <BotaoCriarPrimeiraTarefa
+                            variant="contained"
+                            onClick={() => setOpenModalCriacao(true)}
+                            startIcon={<AdicionarIcon />}
+                        >
+                            Criar Primeira Tarefa
+                        </BotaoCriarPrimeiraTarefa>
                     </EmptyContainer>
                 </PainelCard>
+
+                {/* Modal de criação de atividade */}
+                <ModalCriacaoAtividade
+                    open={openModalCriacao}
+                    onClose={handleCloseModalCriacao}
+                    onTaskCreated={onTaskUpdated}
+                    onLoadingChange={onLoadingChange}
+                />
             </PainelContainer>
         )
     }
@@ -265,12 +282,15 @@ export const PainelTarefas = ({ data }: { data: any }) => {
                     <FavoritasContainer>
                         <TarefasContainer>
                             {tarefasFavoritas.map((task: any, index: number) => (
-                                <CardTarefa 
-                                    key={task?.id} 
-                                    task={task} 
-                                    formatarNomeCores={formatarNomeCores} 
+                                <CardTarefa
+                                    key={task?.id}
+                                    task={task}
+                                    formatarNomeCores={formatarNomeCores}
                                     coresDisponiveis={coresDisponiveis}
                                     isLastItem={index === tarefasFavoritas.length - 1}
+                                    onTaskUpdated={onTaskUpdated}
+                                    onLoadingChange={onLoadingChange}
+                                    onDeleteTask={onDeleteTask}
                                 />
                             ))}
                         </TarefasContainer>
@@ -287,12 +307,15 @@ export const PainelTarefas = ({ data }: { data: any }) => {
                     <TarefasNormaisContainer>
                         <TarefasContainer>
                             {tarefasNormais.map((task: any, index: number) => (
-                                <CardTarefa 
-                                    key={task?.id} 
-                                    task={task} 
+                                <CardTarefa
+                                    key={task?.id}
+                                    task={task}
                                     formatarNomeCores={formatarNomeCores}
                                     coresDisponiveis={coresDisponiveis}
                                     isLastItem={index === tarefasNormais.length - 1}
+                                    onTaskUpdated={onTaskUpdated}
+                                    onLoadingChange={onLoadingChange}
+                                    onDeleteTask={onDeleteTask}
                                 />
                             ))}
                         </TarefasContainer>
@@ -312,7 +335,12 @@ export const PainelTarefas = ({ data }: { data: any }) => {
             )}
 
             {/* modal de criação de atividade */}
-            <ModalCriacaoAtividade open={openModalCriacao} onClose={handleCloseModalCriacao} />
+            <ModalCriacaoAtividade
+                open={openModalCriacao}
+                onClose={handleCloseModalCriacao}
+                onTaskCreated={onTaskUpdated}
+                onLoadingChange={onLoadingChange}
+            />
         </PainelContainer>
     )
 }

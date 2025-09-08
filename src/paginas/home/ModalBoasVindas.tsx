@@ -11,7 +11,13 @@ import {
 } from './ModalBoasVindasStyles'
 import { Card, ModalCastroContainer } from '../login/PaginaLoginStyles'
 
-export const ModalBoasVindas = ({ open, onClose }: { open: boolean, onClose: () => void }) => {
+export const ModalBoasVindas = ({ open, onClose, tasks }: { open: boolean, onClose: () => void, tasks: any }) => {
+
+    /** Função para contar o numero de tarefas do dia */
+    const countTasksToday = () => {
+        return tasks.filter((task: any) => task?.created_at.split('T')[0] === new Date().toISOString().split('T')[0]).length || 0
+    }
+
     return (
         <ModalCastroContainer   
             open={open}
@@ -34,13 +40,13 @@ export const ModalBoasVindas = ({ open, onClose }: { open: boolean, onClose: () 
                     {/* Estatísticas */}
                     <StatsContainer>
                         <StatCard>
-                            <StatNumber>3</StatNumber>
+                            <StatNumber>{countTasksToday()}</StatNumber>
                             <StatLabel>Tarefas para Hoje</StatLabel>
                         </StatCard>
                         
                     </StatsContainer>
 
-                    <HomeSubtitle variant="body2" style={{ textAlign: 'center', marginTop: '1rem' }}>
+                    <HomeSubtitle variant="body2" style={{ textAlign: 'center', marginTop: '0.5rem' }}>
                         💡 Dica: Use os filtros e favoritos para organizar melhor suas tarefas!
                     </HomeSubtitle>
 

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 
+/**Hook para obter o tamanho da janela*/
 export function useWindowSize() {
     
   const [windowSize, setWindowSize] = useState({
@@ -17,7 +18,6 @@ export function useWindowSize() {
 
     window.addEventListener("resize", handleResize);
 
-    // chama uma vez para garantir valores corretos
     handleResize();
 
     return () => window.removeEventListener("resize", handleResize);

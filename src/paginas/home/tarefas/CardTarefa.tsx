@@ -1,26 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import {
-    ColorContainer,
-    FavoritoIcon,
-    TarefaCor,
-    TarefaData,
-    TarefaHeader,
-    TarefaItem,
-    TarefaNome,
-    TarefaStatus,
-    TarefaDescricao,
-    TarefaMeta,
-    TarefaInfo,
-    ActionsContainer,
-    TarefaInfoContainer,
-    DataCorContainer,
-    PaletaCoresContainer,
-    PaletaHeader,
-    PaletaTitle,
-    PaletaCloseButton,
-    CoresGrid,
-    CorPaletaItem
-} from "./PainelTarefasStyles";
+import { ColorContainer, FavoritoIcon, TarefaCor, TarefaData, TarefaHeader, TarefaItem, TarefaNome, TarefaStatus, TarefaDescricao, TarefaMeta, TarefaInfo, ActionsContainer, TarefaInfoContainer, DataCorContainer, PaletaCoresContainer, PaletaHeader, PaletaTitle, PaletaCloseButton, CoresGrid, CorPaletaItem } from "./PainelTarefasStyles";
 import StarIcon from '@mui/icons-material/Star';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import ColorLensIcon from '@mui/icons-material/ColorLens';
@@ -30,8 +9,10 @@ import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Cancel';
 import CloseIcon from '@mui/icons-material/Close';
 import { conexaoApi } from '../../../servicos/api/ConexaoApi';
+import { useSnackbar } from '../../../servicos/context/SnackbarContext';
 
-export const CardTarefa = ({ task, formatarNomeCores, coresDisponiveis, isLastItem }: { task: any, formatarNomeCores: any, coresDisponiveis: any, isLastItem?: boolean }) => {
+export const CardTarefa = ({ task, formatarNomeCores, coresDisponiveis, isLastItem, onTaskUpdated, onLoadingChange, onDeleteTask }: { task: any, formatarNomeCores: any, coresDisponiveis: any, isLastItem?: boolean, onTaskUpdated?: () => void, onLoadingChange?: (loading: boolean) => void, onDeleteTask?: (taskId: string) => void }) => {
+    const { showSnackbar } = useSnackbar();
 
     // Estados para edição
     const [isEditing, setIsEditing] = useState(false);
@@ -70,9 +51,23 @@ export const CardTarefa = ({ task, formatarNomeCores, coresDisponiveis, isLastIt
 
     /**Função genrica para atualizar a tarefa */
     const handleAtualizarTarefaBanco = async (objeto: any) => {
-        console.log('MANDANDO PARA O BANCO:', objeto)
-        const res = await conexaoApi.put(`/tarefas/${objeto.id}`, objeto)
-        console.log('RES:', res)
+        if (onLoadingChange) {
+            onLoadingChange(true)
+        }
+        try {
+            await conexaoApi.put(`/tarefas/${objeto.id}`, objeto)
+            showSnackbar('Tarefa atualizada com sucesso!', 'success')
+
+            if (onTaskUpdated) {
+                onTaskUpdated()
+            }
+        } catch (error) {
+            showSnackbar('Erro ao atualizar tarefa. Tente novamente.', 'error')
+        } finally {
+            if (onLoadingChange) {
+                onLoadingChange(false)
+            }
+        }
     }
 
     /** Função para verificar se há mudanças pendentes */
@@ -86,26 +81,24 @@ export const CardTarefa = ({ task, formatarNomeCores, coresDisponiveis, isLastIt
     };
 
     /** Função para mudar o status da tarefa */
-    const handleStatus = (id: string) => {
+    const handleStatus = () => {
         const newStatus = !pendingStatus;
         setPendingStatus(newStatus);
-        // Não salva automaticamente, apenas marca como pendente
     }
 
     /** Função para mudar o status de favorita da tarefa */
-    const handleFavorita = (id: string) => {
+    const handleFavorita = () => {
         const newFavorita = !pendingFavorita;
         setPendingFavorita(newFavorita);
-        // Não salva automaticamente, apenas marca como pendente
     }
 
     /** Função para mudar a cor da tarefa */
-    const handleCor = (id: string, cor: string) => {
+    const handleCor = (cor: string) => {
         setPendingCor(cor);
     }
 
     /** Função para editar a tarefa */
-    const handleEditar = (id: string) => {
+    const handleEditar = () => {
         setIsEditing(true);
     }
 
@@ -124,7 +117,6 @@ export const CardTarefa = ({ task, formatarNomeCores, coresDisponiveis, isLastIt
 
         handleAtualizarTarefaBanco(mudancas);
 
-        // Reset dos estados
         setHasUnsavedChanges(false);
         setIsEditing(false);
         setEditedNome(task?.nome || '');
@@ -143,30 +135,10 @@ export const CardTarefa = ({ task, formatarNomeCores, coresDisponiveis, isLastIt
         setIsEditing(false);
     }
 
-    /** Função para deletar a tarefa */
-    const handleDeletar = async (id: string) => {
-        try {
-            const confirmacao = window.confirm('Tem certeza que deseja deletar esta tarefa? Esta ação não pode ser desfeita.');
-            
-            if (confirmacao) {
-                try {
-                    const response = await conexaoApi.delete(`/tarefas/${id}`);
-
-                    if (response.status === 200) {
-                        console.log('Tarefa deletada com sucesso!');
-                        // Aqui você pode adicionar uma atualização do estado
-                        // Ex: setTarefas(tarefas.filter(t => t.id !== id));
-                    } else {
-                        console.log('Erro ao deletar tarefa! Status:', response.status);
-                        window.alert('Não foi possível deletar a tarefa. Tente novamente.');
-                    }
-                } catch (error) {
-                    console.error('Erro ao deletar tarefa:', error);
-                    window.alert('Não foi possível deletar a tarefa. Tente novamente.');
-                }
-            }
-        } catch (error) {
-            console.error('Erro ao exibir confirmação:', error);
+    /** Função para solicitar exclusão */
+    const handleDeletar = () => {
+        if (onDeleteTask) {
+            onDeleteTask(task?.id);
         }
     };
 
@@ -186,12 +158,12 @@ export const CardTarefa = ({ task, formatarNomeCores, coresDisponiveis, isLastIt
                     <TarefaMeta>
                         <TarefaStatus
                             $status={pendingStatus}
-                            onClick={() => handleStatus(task?.id)}
+                            onClick={handleStatus}
                         >
                             {pendingStatus ? 'Pendente' : 'Concluída'}
                         </TarefaStatus>
 
-                        <FavoritoIcon onClick={() => handleFavorita(task?.id)}>
+                        <FavoritoIcon onClick={handleFavorita}>
                             {pendingFavorita ?
                                 <StarIcon style={{ color: '#ffd700' }} /> :
                                 <StarBorderIcon style={{ color: '#ccc' }} />
@@ -239,8 +211,8 @@ export const CardTarefa = ({ task, formatarNomeCores, coresDisponiveis, isLastIt
                                             data-icon="save"
                                         />
                                     )}
-                                    <EditSquareIcon onClick={() => handleEditar(task?.id)} />
-                                    <DeleteIcon onClick={() => handleDeletar(task?.id)} />
+                                    <EditSquareIcon onClick={handleEditar} />
+                                    <DeleteIcon onClick={handleDeletar} />
                                 </>
                             )}
                         </ActionsContainer>
@@ -268,7 +240,7 @@ export const CardTarefa = ({ task, formatarNomeCores, coresDisponiveis, isLastIt
                                 $cor={cor}
                                 $selected={pendingCor === cor}
                                 onClick={() => {
-                                    handleCor(task?.id, cor);
+                                    handleCor(cor);
                                     setMostraPaletaCores(false);
                                 }}
                                 title={`Cor: ${formatarNomeCores(cor)}`}

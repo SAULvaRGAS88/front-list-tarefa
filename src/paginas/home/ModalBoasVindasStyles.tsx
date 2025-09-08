@@ -2,14 +2,14 @@ import styled from "styled-components"
 import { Typography, Button } from "@mui/material"
 
 // Header
-export const Header = styled.header<{ isMobile: boolean }>`
+export const Header = styled.header<{ $isMobile: boolean }>`
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
   border-radius: 15px;
   padding: 1rem;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   display: flex;
-  justify-content: ${({ isMobile }) => isMobile ? 'center' : 'space-between'};
+  justify-content: ${({ $isMobile }) => $isMobile ? 'center' : 'space-between'};
   align-items: center;
   gap: 1rem;
   
@@ -271,12 +271,13 @@ export const StatLabel = styled.div`
 export const ModalCard = styled.div`
   width: 95%;
   max-width: 500px;
-  height: 90vh;                 
+  max-height: 90vh;                 
   margin: auto;              
   border-radius: 20px;     
   overflow-y: auto; 
   display: flex;
-
+  align-items: center;
+  justify-content: center;
 
   @media (min-width: 768px) {
     width: 90%;
@@ -290,7 +291,7 @@ export const ModalActionsContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  margin-top: 1.5rem;
+  margin-top: 1rem;
   
   @media (min-width: 768px) {
     flex-direction: row;

@@ -10,13 +10,27 @@ import logo from "../../../public/logo.svg"
 import { conexaoApi } from "../../servicos/api/ConexaoApi"
 import { useNavigate, useParams } from "react-router-dom"
 import { PainelTarefas } from "./tarefas/PainelTarefas"
+import { LoadApp } from "../../componentes/loadApp/LoadApp"
+import { useSnackbar } from "../../servicos/context/SnackbarContext"
 import { useWindowSize } from "../../hooks/UseWindowSize"
 import { FontSizeResponsivoApp } from "../../componentes/styles/FontSizeResponsivoApp"
 import { IconButton } from "@mui/material"
 import MenuIcon from '@mui/icons-material/Menu';
 import MenuLateral from "./menuLateral/MenuLateral"
+import WarningIcon from '@mui/icons-material/Warning';
+import { PaginaNotFound } from "../notFound/PaginaNotFound";
+import {
+    ModalConfirmacaoContainer,
+    ModalConfirmacaoCard,
+    ModalConfirmacaoIcon,
+    ModalConfirmacaoTitle,
+    ModalConfirmacaoMessage,
+    ModalConfirmacaoActions,
+    ModalConfirmacaoButton
+} from "./tarefas/PainelTarefasStyles";
 
 export const PaginaHome = () => {
+    const { showSnackbar } = useSnackbar();
 
     //navegação
     const navigate = useNavigate()
@@ -25,6 +39,10 @@ export const PaginaHome = () => {
     // Estados do componente
     const [open, setOpen] = useState(false)
     const [tasks, setTasks] = useState([])
+    const [isLoading, setIsLoading] = useState(false)
+    const [showModalConfirmacao, setShowModalConfirmacao] = useState(false)
+    const [taskToDelete, setTaskToDelete] = useState<any>(null)
+    const [isDeleting, setIsDeleting] = useState(false)
 
     //estado do componente
     const [openMenu, setOpenMenu] = useState(false)
@@ -35,7 +53,7 @@ export const PaginaHome = () => {
     /**Se o usuário não estiver logado, redireciona para a página de login */
     useEffect(() => {
         const usuario = getUser()
-        if (idUsuario !== usuario.id) {
+        if (!usuario || !usuario.id || !usuario.nome || idUsuario !== usuario.id) {
             navigate('/not-found')
         }
     }, [navigate, idUsuario])
@@ -62,6 +80,49 @@ export const PaginaHome = () => {
         setTasks(res.data.data.tarefas)
     }
 
+    /** Função para solicitar exclusão de tarefa */
+    const handleDeleteTask = (taskId: string) => {
+        const task = tasks.find((t: any) => t.id === taskId);
+        if (task) {
+            setTaskToDelete(task);
+            setShowModalConfirmacao(true);
+        }
+    };
+
+    /** Função para confirmar exclusão */
+    const handleConfirmarExclusao = async () => {
+        if (!taskToDelete) return;
+
+        setIsDeleting(true);
+        setIsLoading(true);
+
+        try {
+            const response = await conexaoApi.delete(`/tarefas/${taskToDelete.id}`);
+
+            if (response.status === 200) {
+                showSnackbar('Tarefa deletada com sucesso!', 'success');
+                setShowModalConfirmacao(false);
+                setTaskToDelete(null);
+
+                await getTasks();
+            } else {
+                showSnackbar('Erro ao deletar tarefa. Tente novamente.', 'error');
+            }
+        } catch (error) {
+            console.error('Erro ao deletar tarefa:', error);
+            showSnackbar('Erro ao deletar tarefa. Tente novamente.', 'error');
+        } finally {
+            setIsDeleting(false);
+            setIsLoading(false);
+        }
+    };
+
+    /** Função para cancelar exclusão */
+    const handleCancelarExclusao = () => {
+        setShowModalConfirmacao(false);
+        setTaskToDelete(null);
+    };
+
     // Efeito para abrir o modal de boas vindas quando o componente for montado
     useEffect(() => {
         setOpen(true)
@@ -73,10 +134,17 @@ export const PaginaHome = () => {
         setOpenMenu(true)
     }
 
+    // Verificar se o usuário está logado antes de renderizar
+    const usuario = getUser()
+    if (!usuario || !usuario.id || !usuario.nome || idUsuario !== usuario.id) {
+        return <PaginaNotFound />
+    }
+
     return (
         <HomeContainer>
+
             {/* header */}
-            <Header isMobile={width < 768}>
+            <Header $isMobile={width < 768}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <Logo>
                         <img src={logo} alt="Logo" />
@@ -87,7 +155,7 @@ export const PaginaHome = () => {
 
                         }}
                         style={{ textAlign: 'center', marginLeft: '10px', marginBottom: '0px' }}
-                    >Bem-vindo(a) {getUser().nome}!</HomeTitle>
+                    >Bem-vindo(a) {getUser()?.nome}!</HomeTitle>
                 </div>
 
 
@@ -101,13 +169,57 @@ export const PaginaHome = () => {
             {/* conteudo */}
             <PainelTarefas
                 data={tasks}
+                onTaskUpdated={getTasks}
+                onLoadingChange={setIsLoading}
+                onDeleteTask={handleDeleteTask}
             />
 
             {/* modal de boas vindas */}
-            <ModalBoasVindas open={open} onClose={handleClose} />
+            <ModalBoasVindas open={open} onClose={handleClose} tasks={tasks} />
 
             {/* menu lateral */}
             <MenuLateral open={openMenu} onClose={handleCloseMenu} />
+
+            {/* Loading centralizado */}
+            <LoadApp open={isLoading} />
+
+            {/* Modal de confirmação de exclusão */}
+            {showModalConfirmacao && (
+                <ModalConfirmacaoContainer>
+                    <ModalConfirmacaoCard>
+                        <ModalConfirmacaoIcon>
+                            <WarningIcon />
+                        </ModalConfirmacaoIcon>
+
+                        <ModalConfirmacaoTitle>
+                            Excluir Tarefa
+                        </ModalConfirmacaoTitle>
+
+                        <ModalConfirmacaoMessage>
+                            Tem certeza que deseja excluir a tarefa <strong>"{taskToDelete?.nome}"</strong>?
+                            Esta ação não pode ser desfeita.
+                        </ModalConfirmacaoMessage>
+
+                        <ModalConfirmacaoActions>
+                            <ModalConfirmacaoButton
+                                $variant="cancel"
+                                onClick={handleCancelarExclusao}
+                                disabled={isDeleting}
+                            >
+                                Cancelar
+                            </ModalConfirmacaoButton>
+
+                            <ModalConfirmacaoButton
+                                $variant="delete"
+                                onClick={handleConfirmarExclusao}
+                                disabled={isDeleting}
+                            >
+                                {isDeleting ? 'Excluindo...' : 'Excluir'}
+                            </ModalConfirmacaoButton>
+                        </ModalConfirmacaoActions>
+                    </ModalConfirmacaoCard>
+                </ModalConfirmacaoContainer>
+            )}
         </HomeContainer>
     )
 }
