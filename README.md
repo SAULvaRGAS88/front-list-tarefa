@@ -1,5 +1,9 @@
 # 📋 Sistema de Gestão de Tarefas
 
+🚀 Desenvolvido por: Saul Vargas 🚀
+
+[LinkedIn](https://www.linkedin.com/in/saul-vargas-68a97347/)
+
 ## 📖 Visão Geral
 
 O **Sistema de Gestão de Tarefas** é uma aplicação web moderna desenvolvida em React com TypeScript, que permite aos usuários gerenciar suas tarefas de forma eficiente e organizada. A aplicação oferece uma interface intuitiva e responsiva para criação, edição, exclusão e organização de tarefas.
@@ -300,4 +304,5 @@ Para dúvidas ou problemas, verifique:
 4. **API status** em caso de falhas
 
 **Sistema desenvolvido com foco em usabilidade, performance e experiência do usuário.**
+
 
